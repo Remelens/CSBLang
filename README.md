@@ -1,5 +1,5 @@
 # CSBLang
-A runtme program for https://github.com/Hiyoteam/SBLang
+A runtime program for https://github.com/Hiyoteam/SBLang
 
 # Docs
 
