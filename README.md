@@ -3,7 +3,7 @@ A runtme program for https://github.com/Hiyoteam/SBLang
 
 # Docs
 
->A little different from [https://github.com/Hiyoteam/SBLang](https://github.com/Hiyoteam/SBLang)
+>* A little different from [https://github.com/Hiyoteam/SBLang](https://github.com/Hiyoteam/SBLang)
 
 ----------
 
