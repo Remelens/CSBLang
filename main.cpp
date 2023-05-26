@@ -1,55 +1,56 @@
 /*
-CppSBLang Runtime program v1.0
-
-Copyright (C) 2022-2023 HelloOSMe
-All rights reserved.
-*/
+  CppSBLang Runtime program v1.0
+  
+  Copyright (C) 2022-2023 HelloOSMe
+  All rights reserved.
+ */
 #include<bits/stdc++.h>
 using namespace std;
 bool runfile=false;
 map<string,map<int,string>> hs;
 map<string,string> strvar;
 map<string,int> hasvar;//1:var;2:func;
+ifstream fin;
 void err(string s,int line){
-    cout<<"SBLang Error:Line:"<<line<<endl<<s<<endl;
-    if(runfile){
-        exit(-1);
-    }
+	cout<<"SBLang Error:Line:"<<line<<endl<<s<<endl;
+	if(runfile){
+		exit(-1);
+	}
 }
 string getElement(string s,int num){
-    int i=0;
-    while(s[i]==' ')i++;
-    int j=1;
-    string rs="";
-    bool str=false;
-    for(;i<s.size();i++){
-        if(s[i]==' '&&!str){
-            if(j==num)return rs;
-            rs.clear();
-            j++;
-        }else if(s[i]=='"'){
-            str=!str;
-        }else
-        rs.push_back(s[i]);
-    }
-    return rs;
+	int i=0;
+	while(s[i]==' ')i++;
+	int j=1;
+	string rs="";
+	bool str=false;
+	for(;i<s.size();i++){
+		if(s[i]==' '&&!str){
+			if(j==num)return rs;
+			rs.clear();
+			j++;
+		}else if(s[i]=='"'){
+			str=!str;
+		}else
+			rs.push_back(s[i]);
+	}
+	return rs;
 }
 string getVar(string s,int num,int line){
-    if(s[s.size()-1]==','){
-        err("Bad var request\n"+s,line);
-    }
-    s+=",";
-    string t="";
-    int n=1;
-    for(int i=0;i<s.size();i++){
-        if(s[i]==','){
-            if(n==num)return t;
-            t.clear();
-            n++;
-        }else
-        t.push_back(s[i]);
-    }
-    return "";
+	if(s[s.size()-1]==','){
+		err("Bad var request\n"+s,line);
+	}
+	s+=",";
+	string t="";
+	int n=1;
+	for(int i=0;i<s.size();i++){
+		if(s[i]==','){
+			if(n==num)return t;
+			t.clear();
+			n++;
+		}else
+			t.push_back(s[i]);
+	}
+	return "";
 }
 void runtime(string cmd,int line){
 	string cn=getElement(cmd,1);
@@ -111,17 +112,22 @@ void runtime(string cmd,int line){
 			string tmp,tmp2;
 			bool su=true;
 			while(1){
-			    cout<<": ";
-			    getline(cin,tmp);
+				if(!runfile){
+					cout<<": ";
+					getline(cin,tmp);
+				}else{
+					if(fin.eof()){exit(0);}
+					getline(fin,tmp);
+				}
 				if(tmp[0]!='d'||tmp[1]!=' '){
 					err("^ Function grammar err.",line);
 					su=false;
 					break;
 				}else if(getElement(tmp,1)=="d"&&getElement(tmp,2)=="end"){
-				    break;
+					break;
 				}
 				for(int j=2;j<tmp.size();j++){
-				    tmp2.push_back(tmp[j]);
+					tmp2.push_back(tmp[j]);
 				}
 				func[i]=tmp2;
 				tmp2="";
@@ -134,11 +140,11 @@ void runtime(string cmd,int line){
 			hs[getElement(cmd,2)]=func;
 		}
 	}else if(cn=="call"){
-	    int i=0;
-	    string funcname=getElement(cmd,2);
+		int i=0;
+		string funcname=getElement(cmd,2);
 		while(hs[funcname][i]!=""){
-		    runtime(hs[funcname][i],line);
-		    i++;
+			runtime(hs[funcname][i],line);
+			i++;
 		}
 	}else if(cn==""){
 		//no command
@@ -146,25 +152,39 @@ void runtime(string cmd,int line){
 		err("Grammar mistake:no cmd:\n"+cn,line);
 	}
 }
-int main(){
-    cout<<"CSBLang v1.0 developed by HelloOSMe.(SBLang runtime program)"<<endl;
-    cout<<"SBLang Project Docs: https://github.com/Hiyoteam/SBLang"<<endl;
-    string cmd;
-    int line=0;
-    while(1){
-        line++;
-        cout<<"[CSL>] ";
-        getline(cin,cmd);
-        runtime(cmd,line);
-    }
-    return 0;
+int main(int argc,char** argv){
+	if(argc>1){
+		runfile=true;
+		fin.open(argv[1]);
+		if(!fin.is_open()){
+			err("Cannot open file.",0);
+		}
+	}
+	if(!runfile){
+	cout<<"CSBLang v1.0 developed by HelloOSMe.(SBLang runtime program)"<<endl;
+	cout<<"SBLang Project Docs: https://github.com/Hiyoteam/SBLang"<<endl;
+	}
+	string cmd;
+	int line=0;
+	while(1){
+		line++;
+		if(!runfile){
+			cout<<"[CSL>] ";
+			getline(cin,cmd);
+		}else{
+			if(fin.eof()){exit(0);}
+			getline(fin,cmd);
+		}
+		runtime(cmd,line);
+	}
+	return 0;
 }
 /*
-todo list:
-
-include <file>
-shell <cmd>
-
-On Windows:
-WinAPI <funcation name> <parameter>
-*/
+  todo list:
+  
+  include <file>
+  shell <cmd>
+  
+  On Windows:
+  WinAPI <funcation name> <parameter>
+ */

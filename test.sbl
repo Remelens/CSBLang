@@ -1,0 +1,10 @@
+new a,b,c,d
+string a "What's your name?"
+out a
+getchar b
+string c Hello,
+string d !
+appendvar c b
+appendvar c d
+addkeep newline c
+out c
