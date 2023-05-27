@@ -11,6 +11,39 @@ map<string,map<int,string>> hs;
 map<string,string> strvar;
 map<string,int> hasvar;//1:var;2:func;
 ifstream fin;
+string char_to_str(const char* ch){
+	string s;
+	for(int i=0;i<strlen(ch);i++){
+		s.push_back(ch[i]);
+	}
+	return s;
+}
+bool str_allint(string s){
+	for(int i=0;i<s.size();i++){
+		if(s[i]>='0'&&s[i]<='9'){
+			//all right
+		}else{
+			return false;
+		}
+	}
+	return true;
+}
+int str_to_int(string s){
+	int re=0;
+	int i=0;
+	bool mi=false;
+	if(s[i]==0){
+		mi=true;
+		i++;
+	}
+	for(;i<s.size();i++){
+		re*=10;re+=s[i]-'0';
+	}
+	if(mi){
+		re=-re;
+	}
+	return re;
+}
 void err(string s,int line){
 	cout<<"SBLang Error:Line:"<<line<<endl<<s<<endl;
 	if(runfile){
@@ -51,6 +84,88 @@ string getVar(string s,int num,int line){
 			t.push_back(s[i]);
 	}
 	return "";
+}
+void runtime(string cmd,int line);
+void finclude(string file,int line){
+	ifstream finc (file.c_str());
+	string cmd;
+	bool bkurf=runfile;
+	runfile=true;
+	while(1){
+		if(finc.eof()){
+			runfile=bkurf;
+			finc.close();
+			return;
+		}
+		getline(finc,cmd);
+		string cn=getElement(cmd,1);
+		if(cn=="define"){
+			if(hasvar[getElement(cmd,2)]!=0){
+				err("Already have var or function:"+getElement(cmd,3),line);
+			}else{
+				map<int,string> func;
+				int i=0;
+				string tmp,tmp2="";
+				bool su=true;
+				while(1){
+					if(finc.eof()){return;}
+					getline(finc,tmp);
+					if(tmp[0]!='d'||tmp[1]!=' '){
+						err("^ Function grammar err.",line);
+						su=false;
+						break;
+					}else if(getElement(tmp,1)=="d"&&getElement(tmp,2)=="end"){
+						break;
+					}
+					for(int j=2;j<tmp.size();j++){
+						tmp2.push_back(tmp[j]);
+					}
+					func[i]=tmp2;
+					tmp2="";
+					i++;
+				}
+				if(getElement(tmp,1)!="d"||getElement(tmp,2)!="end"){
+					su=false;
+				}
+				if(!su){return;}
+				hasvar[getElement(cmd,2)]=2;
+				hs[getElement(cmd,2)]=func;
+			}
+		}else if(cn==""){
+			//nocmd
+		}else{
+			runtime(cmd,line);
+		}
+	}
+	runfile=bkurf;
+	finc.close();
+}
+int main(int argc,char** argv){
+	if(argc>1){
+		runfile=true;
+		fin.open(argv[1]);
+		if(!fin.is_open()){
+			err("Cannot open file.",0);
+		}
+	}
+	if(!runfile){
+	cout<<"CSBLang v1.0 developed by HelloOSMe.(SBLang runtime program)"<<endl;
+	cout<<"SBLang Project Docs: https://github.com/Hiyoteam/SBLang"<<endl;
+	}
+	string cmd;
+	int line=0;
+	while(1){
+		line++;
+		if(!runfile){
+			cout<<"[CSL>] ";
+			getline(cin,cmd);
+		}else{
+			if(fin.eof()){exit(0);}
+			getline(fin,cmd);
+		}
+		runtime(cmd,line);
+	}
+	return 0;
 }
 void runtime(string cmd,int line){
 	string cn=getElement(cmd,1);
@@ -99,6 +214,9 @@ void runtime(string cmd,int line){
 				err("No parameter.",line);
 			}
 		}
+		if(getElement(cmd,3)=="endline"){
+			cout<<endl;
+		}
 	}else if(cn=="getchar"){
 		string tmpvar;
 		getline(cin,tmpvar);
@@ -109,7 +227,7 @@ void runtime(string cmd,int line){
 		}else{
 			map<int,string> func;
 			int i=0;
-			string tmp,tmp2;
+			string tmp,tmp2="";
 			bool su=true;
 			while(1){
 				if(!runfile){
@@ -131,6 +249,7 @@ void runtime(string cmd,int line){
 				}
 				func[i]=tmp2;
 				tmp2="";
+				i++;
 			}
 			if(getElement(tmp,1)!="d"||getElement(tmp,2)!="end"){
 				su=false;
@@ -141,43 +260,31 @@ void runtime(string cmd,int line){
 		}
 	}else if(cn=="call"){
 		int i=0;
+		if(hasvar[getElement(cmd,2)]!=2){
+			err("Call bad function:"+getElement(cmd,2)+"[Not defined]",line);
+		}
 		string funcname=getElement(cmd,2);
 		while(hs[funcname][i]!=""){
 			runtime(hs[funcname][i],line);
 			i++;
 		}
+	}else if(cn=="exit"){
+		string exitcode=getElement(cmd,2);
+		if(exitcode==""){
+			exit(0);
+		}else if(str_allint(exitcode)){
+			exit(str_to_int(exitcode));
+		}else{
+			err("Bad exitcode:"+exitcode,line);
+		}
+	}else if(cn=="include"){
+		string file=getElement(cmd,2);
+		finclude(file,line);
 	}else if(cn==""){
 		//no command
 	}else{
 		err("Grammar mistake:no cmd:\n"+cn,line);
 	}
-}
-int main(int argc,char** argv){
-	if(argc>1){
-		runfile=true;
-		fin.open(argv[1]);
-		if(!fin.is_open()){
-			err("Cannot open file.",0);
-		}
-	}
-	if(!runfile){
-	cout<<"CSBLang v1.0 developed by HelloOSMe.(SBLang runtime program)"<<endl;
-	cout<<"SBLang Project Docs: https://github.com/Hiyoteam/SBLang"<<endl;
-	}
-	string cmd;
-	int line=0;
-	while(1){
-		line++;
-		if(!runfile){
-			cout<<"[CSL>] ";
-			getline(cin,cmd);
-		}else{
-			if(fin.eof()){exit(0);}
-			getline(fin,cmd);
-		}
-		runtime(cmd,line);
-	}
-	return 0;
 }
 /*
   todo list:

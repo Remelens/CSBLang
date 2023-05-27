@@ -1,10 +1,10 @@
-new a,b,c,d
-string a "What's your name?"
+include incl.sbl
+new content,a
+string content "your name"
+call get
+string a "hi,"
 out a
-getchar b
-string c Hello,
-string d !
-appendvar c b
-appendvar c d
-addkeep newline c
-out c
+out data
+string a !
+addkeep newline a
+out a
