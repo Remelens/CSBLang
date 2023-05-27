@@ -1,6 +1,11 @@
 # CSBLang
 A runtime program for https://github.com/Hiyoteam/SBLang
 
+# CLI Usage:
+```bash
+sblang [<FileName>]
+```
+
 # Docs
 
 >`*`：A little different from [https://github.com/Hiyoteam/SBLang](https://github.com/Hiyoteam/SBLang)
