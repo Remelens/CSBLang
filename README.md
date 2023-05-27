@@ -150,3 +150,9 @@ out a
 输出：`你叫什么名字：`
 输入：`John Doe`
 输出：`你好，John Doe!`
+
+## include
+### 简介
+引用SBLang文件
+### 用法
+`include 文件名`
