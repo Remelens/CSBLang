@@ -2,8 +2,13 @@
 A runtime program for https://github.com/Hiyoteam/SBLang
 
 # CLI Usage:
+runtime:
 ```bash
 sblang [<FileName>]
+```
+compile to C++ Source code:(do not support SBLang:`define`)
+```bash
+csbl [<FileName>]
 ```
 
 # Docs
