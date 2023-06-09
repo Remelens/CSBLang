@@ -89,7 +89,7 @@ appendvar a b
 ### 简介
 将变量的内容输入到stdout.
 ### 用法
-`out <变量名/字符串> <选项>`
+`out <变量名/字符串> [可选:<选项>]`
 选项解释：
 
 选项包括`endline`，意为输出后换行
@@ -156,7 +156,7 @@ out a
 输入：`John Doe`
 输出：`你好，John Doe!`
 
-## include
+## include*
 ### 简介
 引用SBLang文件
 ### 用法
